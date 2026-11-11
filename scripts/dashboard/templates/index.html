@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudGuard | Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">CG</div>
+            <div>
+                <h2>CloudGuard</h2>
+                <span>HOSTING CONTROL</span>
+            </div>
+        </div>
+
+        <div class="nav-label">OVERVIEW</div>
+        <a class="nav-item active" href="#overview">◈ &nbsp; Dashboard</a>
+        <a class="nav-item" href="#customers">▤ &nbsp; Customers</a>
+        <a class="nav-item" href="#storage">▦ &nbsp; Storage</a>
+        <a class="nav-item" href="#services">⌘ &nbsp; Services</a>
+        <a class="nav-item" href="#backups">◷ &nbsp; Backups</a>
+
+        <div class="sidebar-bottom">
+            <div class="server-indicator"></div>
+            <div>
+                <strong>CloudGuard Server</strong>
+                <span>Private network</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">CLOUD SERVICE PROVIDER</p>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="top-right">
+                <span class="live-dot"></span>
+                <span>Live monitoring</span>
+                <span id="last-updated">Loading...</span>
+            </div>
+        </header>
+
+        <section id="overview">
+            <div class="section-heading">
+                <div>
+                    <h2>System overview</h2>
+                    <p>Real-time health and performance</p>
+                </div>
+                <span class="server-tag" id="hostname">CloudGuard</span>
+            </div>
+
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <div class="metric-top"><span>CPU USAGE</span><span>⌁</span></div>
+                    <div class="metric-value" id="cpu">--%</div>
+                    <div class="progress"><div id="cpu-bar"></div></div>
+                    <p>Processor utilization</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top"><span>MEMORY USAGE</span><span>▤</span></div>
+                    <div class="metric-value" id="memory">--%</div>
+                    <div class="progress"><div id="memory-bar"></div></div>
+                    <p id="memory-detail">RAM utilization</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top"><span>SERVER UPTIME</span><span>◷</span></div>
+                    <div class="metric-value" id="uptime">--</div>
+                    <div class="metric-note">Since last boot</div>
+                    <p>Continuous operation</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top"><span>CUSTOMER SITES</span><span>▣</span></div>
+                    <div class="metric-value" id="site-count">--</div>
+                    <div class="metric-note">Configured websites</div>
+                    <p>Hosted customer websites</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="content-grid" id="storage">
+            <article class="panel">
+                <div class="panel-heading">
+                    <div><h2>Storage utilization</h2><p>Mounted filesystems</p></div>
+                    <span class="panel-icon">▦</span>
+                </div>
+                <div id="disk-list" class="disk-list">Loading storage...</div>
+            </article>
+
+            <article class="panel" id="services">
+                <div class="panel-heading">
+                    <div><h2>Service health</h2><p>Critical server services</p></div>
+                    <span class="panel-icon">⌘</span>
+                </div>
+                <div id="service-list" class="service-list">Loading services...</div>
+            </article>
+        </section>
+
+        <section class="content-grid lower-grid">
+            <article class="panel" id="customers">
+                <div class="panel-heading">
+                    <div><h2>Customer hosting</h2><p>Website directory status</p></div>
+                    <span class="panel-icon">▤</span>
+                </div>
+                <div id="customer-list">Loading customers...</div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-heading">
+                    <div><h2>LVM storage</h2><p>Logical volume configuration</p></div>
+                    <span class="panel-icon">▥</span>
+                </div>
+                <h3 class="subheading">Dedicated data disk</h3>
+                <pre id="vg-info">Loading...</pre>
+                <h3 class="subheading">Logical volumes and mounts</h3>
+                <pre id="lv-info">Loading...</pre>
+            </article>
+        </section>
+
+        <section class="panel backup-panel" id="backups">
+            <div class="panel-heading">
+                <div><h2>Backup history</h2><p>Latest CloudGuard backup snapshots</p></div>
+                <span class="panel-icon">◷</span>
+            </div>
+            <div id="backup-list">Loading backups...</div>
+        </section>
+
+        <footer>
+            <span>CloudGuard Admin Dashboard</span>
+            <span>Read-only monitoring · Auto-refresh every 15 seconds</span>
+        </footer>
+    </main>
+
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>
