@@ -1,1 +1,0 @@
-# Cloud_service_provider
