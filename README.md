@@ -1,62 +1,145 @@
-# CloudGuard – Cloud Service Provider
 
-**Category:** Hackathon-SEE  
-**Project Type:** Linux System Administration / Cloud Infrastructure  
-**Platform:** Ubuntu Server 26.04.1 LTS
+# CloudGuard — Linux-Based Cloud Service Provider
+
+**Hackathon-SEE | B.Tech Information Technology**
+
+CloudGuard is a Linux-based cloud service provider prototype that demonstrates how a service provider can provision customer environments, manage storage, monitor server health, automate backups, and provide customer-facing services through a web portal.
+
+The project combines Linux system administration, server security, automation, web technologies, and centralized monitoring into a single working demonstration.
+
+---
 
 ## 1. Project Overview
 
-CloudGuard is a Linux-based cloud service provider prototype designed to demonstrate how a service provider can host and manage multiple customer websites on a single Linux server.
+CloudGuard provides two separate interfaces:
 
-The project implements isolated customer accounts, dedicated storage volumes, web hosting, automated backups, server monitoring, firewall protection, and a web-based administration dashboard.
+- **Administrator Dashboard:** Centralized monitoring and management of the cloud server, customer environments, storage, services, backups, and support tickets.
+- **Customer Portal:** Separate customer-facing websites for Client 1 and Client 2, with service information, account-related demo information, and support request submission.
 
-## 2. Project Objectives
+The infrastructure runs on an Ubuntu Server virtual machine, administered remotely from an EndeavourOS host.
 
-- Configure a Linux server to act as a basic cloud hosting platform.
-- Provide separate hosting environments for multiple customers.
-- Implement storage allocation using Logical Volume Management (LVM).
-- Configure web hosting using Nginx virtual hosts.
-- Secure customer data through Linux permissions and account isolation.
-- Automate backups and server monitoring.
-- Develop a web dashboard for infrastructure visibility.
+## 2. Architecture
 
-## 3. Technology Stack
+```text
+                  EndeavourOS Host
+                         |
+                  VirtualBox Network
+                         |
+                Ubuntu CloudGuard VM
+                  192.168.56.103
+                         |
+          +--------------+--------------+
+          |              |              |
+        Nginx       Flask Dashboard   Flask Portal
+       Port 80       Port 5000        Port 5001
+          |              |              |
+     +----+----+         |         +----+----+
+     |         |         |         |         |
+  Client 1  Client 2  Admin UI   Portal API
+     |         |         |         |
+     +----+----+         |         |
+          |              |         |
+     Customer         Monitoring  SQLite
+     Websites          and        Database
+                       Support
+                       Management
+```
 
-| Component | Technology |
+### Main Components
+
+| Component | Purpose |
 |---|---|
-| Operating System | Ubuntu Server 26.04.1 LTS |
-| Virtualization | Oracle VirtualBox |
-| Storage Management | LVM |
-| Web Server | Nginx |
-| Backend Dashboard | Python Flask |
-| Application Server | Gunicorn |
-| Firewall | UFW |
-| Remote Administration | OpenSSH |
-| Backup | rsync |
-| Automation | Cron and Bash |
-| Service Management | systemd |
+| Ubuntu Server | Main cloud infrastructure |
+| Nginx | Web server and reverse proxy |
+| Flask | Dashboard and customer portal applications |
+| Gunicorn | Application server |
+| SQLite | Customer support ticket storage |
+| LVM | Logical storage management |
+| UFW | Firewall management |
+| SSH | Secure remote administration |
+| rsync | Automated backup operations |
+| cron | Scheduled tasks |
+| systemd | Service management |
 
-## 4. Infrastructure Configuration
+## 3. Administrator Dashboard
 
-The project uses an Ubuntu Server virtual machine hosted through VirtualBox.
+The CloudGuard administrator dashboard provides centralized visibility into the server environment.
 
-| Component | Configuration |
-|---|---|
-| Server Hostname | cloudguard-server |
-| Server Administrator | cloudadmin |
-| Server IP | 192.168.56.103 |
-| Network | Host-only |
-| Customer 1 | client1 |
-| Customer 2 | client2 |
+Features include:
 
-The server hosts two separate customer environments:
+- System information and resource monitoring.
+- CPU, memory, and disk utilization.
+- Customer environment status.
+- Storage and logical volume information.
+- Running system services.
+- Backup status and history.
+- Customer support ticket management.
+- Automatic dashboard refresh every 15 seconds.
 
-- `client1.cloudguard.local`
-- `client2.cloudguard.local`
+**Dashboard URL:**
 
-## 5. Storage Management
+`http://192.168.56.103:5000`
 
-Logical Volume Management is used to allocate dedicated storage for customer environments and backups.
+## 4. Customer Portal
+
+CloudGuard provides separate customer-facing websites.
+
+### Client 1
+
+`http://client1.cloudguard.local`
+
+### Client 2
+
+`http://client2.cloudguard.local`
+
+Each customer has a separate website environment and customer-specific portal identity.
+
+The Nginx virtual hosts route requests to the appropriate customer environment and forward API requests to the internal Flask portal application.
+
+### Customer Portal Features
+
+- Customer-specific service information.
+- Demo account and billing information.
+- Support request submission.
+- Customer-specific API routing.
+
+## 5. Support Ticket Management
+
+The support ticket system connects the customer portal with the administrator dashboard.
+
+Workflow:
+
+1. A customer submits a support request through their portal.
+2. The Flask portal API validates and stores the request.
+3. The ticket is saved in an SQLite database.
+4. The administrator retrieves tickets through the dashboard.
+5. The administrator can update ticket status.
+6. Customers' requests can be tracked through the support workflow.
+
+Supported ticket statuses:
+
+- Open
+- In Progress
+- Resolved
+
+Internal support management endpoints are protected using an administrator bearer token and restricted to loopback communication.
+
+## 6. Linux Infrastructure and Administration
+
+The project demonstrates practical Linux server administration, including:
+
+- Linux user and group management.
+- Customer-specific directory permissions.
+- Logical Volume Manager (LVM) configuration.
+- Separate logical storage volumes for customers and backups.
+- SSH configuration hardening.
+- UFW firewall configuration.
+- Nginx virtual host configuration.
+- systemd service creation and management.
+- Scheduled backup and monitoring tasks.
+- Server health monitoring.
+
+### Storage Allocation
 
 | Logical Volume | Allocated Storage |
 |---|---:|
@@ -64,108 +147,176 @@ Logical Volume Management is used to allocate dedicated storage for customer env
 | Client 2 | 8 GB |
 | Backups | 4 GB |
 
-The dedicated data disk has a capacity of approximately 25 GB.
+## 7. Backup and Automation
 
-LVM provides flexible storage allocation and makes it easier to manage customer storage independently.
+CloudGuard implements automated backup operations using `rsync` and cron.
 
-## 6. Customer Isolation and Web Hosting
+The backup system includes:
 
-Separate Linux customer accounts and directory structures are configured for the hosted environments.
+- Scheduled daily backups.
+- Retention of the latest seven backup sets.
+- Separate backup storage.
+- Scheduled monitoring operations.
 
-Nginx virtual hosts serve the individual customer websites.
+These operations demonstrate basic data protection and routine server maintenance.
 
-Linux ownership and permission settings restrict unauthorized access between customer environments.
+## 8. Security Implementation
 
-## 7. Security Implementation
+Security is addressed at both infrastructure and application levels.
 
-The following security measures are implemented:
+Implemented measures include:
 
-- UFW firewall configuration.
-- SSH security hardening.
-- Separate customer Linux accounts.
-- Restricted directory permissions.
-- Isolated customer website directories.
-- Dedicated dashboard service account.
-- Dashboard authentication.
+- SSH hardening for remote administration.
+- UFW firewall rules.
+- Linux user and group permission separation.
+- Customer-specific directory access.
+- Nginx virtual host separation.
+- Trusted customer identity headers configured by Nginx.
+- Internal portal API restricted to loopback communication.
+- Bearer-token protection for administrator support endpoints.
+- Environment-based storage of sensitive configuration.
+- Dedicated system service accounts.
 - systemd service hardening.
-- Read-only infrastructure monitoring.
 
-## 8. Backup and Monitoring
+**Security limitation:** The current customer portal is a demonstration prototype. It does not implement full customer login/password authentication or real payment processing. Customer separation is demonstrated through Nginx virtual hosts and trusted server-side routing.
 
-Automated backup and monitoring functionality is configured on the server.
+## 9. Technology Stack
 
-The backup system uses rsync to copy customer website data into dedicated backup storage.
+| Technology | Usage |
+|---|---|
+| EndeavourOS | Host operating system |
+| Ubuntu Server | Cloud server environment |
+| VirtualBox | Virtualization |
+| Linux | Server administration |
+| Nginx | Web serving and reverse proxy |
+| Python | Backend programming |
+| Flask | Web applications and APIs |
+| Gunicorn | WSGI application server |
+| SQLite | Support ticket database |
+| HTML5 | Frontend structure |
+| CSS3 | Frontend styling |
+| JavaScript | Frontend interactions |
+| LVM | Storage management |
+| UFW | Firewall |
+| SSH | Remote administration |
+| rsync | Backup operations |
+| cron | Task scheduling |
+| systemd | Service management |
+| Git and GitHub | Version control |
 
-The backup process retains a limited number of recent backups to manage storage usage.
+## 10. Repository Structure
 
-Scheduled tasks are configured through cron.
+```text
+Cloud_service_provider/
+│
+├── docs/
+│   ├── architecture.md
+│   ├── implementation_log.md
+│   ├── requirements_and_scope.md
+│   ├── CloudGuard_Master_Documentation.md
+│   ├── Cloud_Service_Provider_Hackathon_SEE_Report.pdf
+│   └── generate_presentation.py
+│
+├── scripts/
+│   ├── dashboard/
+│   │   ├── app.py
+│   │   ├── requirements.txt
+│   │   ├── templates/
+│   │   │   └── index.html
+│   │   └── static/
+│   │       ├── dashboard.js
+│   │       └── style.css
+│   │
+│   └── portal/
+│       ├── portal_app.py
+│       ├── requirements.txt
+│       ├── index.html
+│       ├── client1.html
+│       ├── client2.html
+│       ├── portal.css
+│       └── portal.js
+│
+└── README.md
+```
 
-A monitoring script collects server information and supports periodic infrastructure checks.
+*The repository may contain additional documentation and supporting files.*
 
-A backup restoration test was also performed to validate the recovery process.
+## 11. Running the Demonstration
 
-## 9. CloudGuard Administration Dashboard
+The project is designed to run using an Ubuntu Server virtual machine hosted through VirtualBox.
 
-A Flask-based administration dashboard provides a centralized interface for viewing server information.
+### Prerequisites
 
-The dashboard includes:
+- EndeavourOS or another Linux host.
+- Oracle VirtualBox.
+- Ubuntu Server.
+- Python 3.
+- Nginx.
+- Git.
+- Administrative privileges on the Ubuntu VM.
 
-- Infrastructure overview.
-- Customer hosting information.
-- Storage utilization.
-- Backup history.
-- Service status.
-- Monitoring information.
+### Accessing the Applications
 
-Gunicorn is used to serve the Flask application, with systemd managing the dashboard service.
+Once the infrastructure and services are configured:
 
-## 10. Project Evidence
+| Application | Address |
+|---|---|
+| Administrator Dashboard | `http://192.168.56.103:5000` |
+| Client 1 Portal | `http://client1.cloudguard.local` |
+| Client 2 Portal | `http://client2.cloudguard.local` |
 
-Screenshots documenting the implementation and testing are available in:
+The two customer hostnames must resolve to the CloudGuard VM's IP address on the host machine.
 
-`CloudGuard_Evidence/screenshots/`
+The project documentation contains additional implementation details, configuration information, and demonstration guidance.
 
-The evidence includes:
+## 12. Testing and Validation
 
-- Dashboard overview.
-- Storage and LVM configuration.
-- Customer account isolation.
-- Hosted customer websites.
-- Firewall and SSH security.
-- Backup history and logs.
-- Monitoring and cron configuration.
-- Dashboard service hardening.
+The project includes practical validation of:
 
-## 11. Project Limitations
+- Linux user and group configuration.
+- Customer directory permissions.
+- Logical volume allocation.
+- SSH access and hardening.
+- Firewall configuration.
+- Nginx customer virtual host routing.
+- Dashboard application availability.
+- Customer portal API availability.
+- Customer identity separation.
+- Support ticket submission and storage.
+- Administrator support ticket retrieval and status updates.
+- Backup and monitoring services.
 
-This implementation is a locally hosted cloud service provider prototype.
+The dashboard and customer portal were deployed and tested on the Ubuntu Server VM.
 
-It does not currently include:
+## 13. Limitations and Future Scope
 
-- Public cloud deployment.
-- Public DNS configuration.
-- Public HTTPS hosting.
-- High availability or automatic failover.
-- Customer billing and payment processing.
-- A production-scale customer management database.
+CloudGuard is an academic prototype and can be extended with:
 
-## 12. Future Scope
+- Full customer authentication and role-based access control.
+- Real payment gateway integration.
+- Dynamic customer provisioning.
+- Automated resource allocation.
+- Cloud API integration.
+- Container-based customer isolation.
+- Centralized logging and alerting.
+- Advanced monitoring and reporting.
+- HTTPS with valid domain certificates.
+- More comprehensive backup restoration and disaster recovery.
 
-Possible improvements include:
+## 14. Project Documentation
 
-- Public cloud deployment.
-- Domain registration and DNS integration.
-- HTTPS certificates.
-- Customer self-service portal.
-- Resource usage quotas.
-- Billing and subscription management.
-- High availability and load balancing.
-- Database-backed customer management.
+Additional project materials are available in the `docs/` directory:
 
-## 13. Conclusion
+- **Master Documentation:** `docs/CloudGuard_Master_Documentation.md`
+- **Hackathon-SEE Project Report:** `docs/Cloud_Service_Provider_Hackathon_SEE_Report.pdf`
+- **Architecture Documentation:** `docs/architecture.md`
+- **Implementation Log:** `docs/implementation_log.md`
+- **Requirements and Scope:** `docs/requirements_and_scope.md`
 
-CloudGuard demonstrates the fundamental components of a Linux-based cloud hosting environment.
+## 15. Contributors
 
-The project combines Linux administration, storage management, web hosting, access isolation, security hardening, automated backups, monitoring, and dashboard development into a working prototype.
+Developed as a team project for the B.Tech Information Technology Hackathon-SEE.
 
-It provides practical exposure to the infrastructure and administrative concepts involved in operating a basic cloud service provider.
+---
+
+**CloudGuard — Secure Infrastructure. Managed Services. Centralized Control.**
