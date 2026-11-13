@@ -8,6 +8,9 @@ import psutil
 from flask import Flask, jsonify, render_template, request, Response
 from werkzeug.security import check_password_hash
 import hmac
+import json
+import urllib.error
+import urllib.request
 
 app = Flask(__name__)
 
@@ -193,6 +196,64 @@ def overview():
 @app.route("/health")
 def health():
     return jsonify({"status": "healthy", "application": "CloudGuard Dashboard"})
+
+
+def portal_admin_request(path, method="GET", payload=None):
+    """Securely communicate with the internal customer portal API."""
+    token = os.environ.get("PORTAL_ADMIN_TOKEN", "")
+
+    if not token:
+        return jsonify({"error": "Portal admin connection is not configured"}), 503
+
+    body = None
+    headers = {"Authorization": f"Bearer {token}"}
+
+    if payload is not None:
+        body = json.dumps(payload).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+
+    req = urllib.request.Request(
+        f"http://127.0.0.1:5001{path}",
+        data=body,
+        headers=headers,
+        method=method
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=5) as response:
+            result = json.loads(response.read().decode("utf-8"))
+            return jsonify(result), response.status
+
+    except urllib.error.HTTPError as error:
+        try:
+            result = json.loads(error.read().decode("utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            result = {"error": "Portal API request failed"}
+
+        return jsonify(result), error.code
+
+    except (urllib.error.URLError, TimeoutError):
+        return jsonify({"error": "Customer portal is unavailable"}), 502
+
+
+@app.route("/api/support", methods=["GET"])
+def support_requests():
+    return portal_admin_request("/internal/support")
+
+
+@app.route("/api/support/<int:request_id>", methods=["PATCH"])
+def update_support_request(request_id):
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "A JSON request body is required"}), 400
+
+    return portal_admin_request(
+        f"/internal/support/{request_id}",
+        method="PATCH",
+        payload=data
+    )
+
 
 
 if __name__ == "__main__":

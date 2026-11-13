@@ -102,3 +102,160 @@ async function refreshDashboard() {
 
 refreshDashboard();
 setInterval(refreshDashboard, 15000);
+
+// ================= SUPPORT TICKET MANAGEMENT =================
+
+function escapeSupportHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+function renderSupportTickets(tickets) {
+    const container = byId("support-list");
+    const summary = byId("support-summary");
+
+    if (!Array.isArray(tickets)) {
+        summary.textContent = "Unexpected response from support service.";
+        container.innerHTML = "";
+        return;
+    }
+
+    const open = tickets.filter(ticket => ticket.status === "Open").length;
+    const progress = tickets.filter(ticket => ticket.status === "In Progress").length;
+    const resolved = tickets.filter(ticket => ticket.status === "Resolved").length;
+
+    summary.textContent =
+        `${tickets.length} total · ${open} open · ${progress} in progress · ${resolved} resolved`;
+
+    if (tickets.length === 0) {
+        container.innerHTML = '<p class="support-empty">No support tickets yet.</p>';
+        return;
+    }
+
+    container.innerHTML = tickets.map(ticket => {
+        const id = Number(ticket.id);
+
+        if (!Number.isSafeInteger(id) || id < 1) return "";
+
+        const status = ["Open", "In Progress", "Resolved"].includes(ticket.status)
+            ? ticket.status
+            : "Open";
+
+        return `
+            <article class="support-ticket" data-ticket-id="${id}">
+                <div class="support-ticket-header">
+                    <div>
+                        <strong>Ticket #${id} — ${escapeSupportHtml(ticket.subject)}</strong>
+                        <div class="support-ticket-meta">
+                            ${escapeSupportHtml(ticket.customer)} ·
+                            ${escapeSupportHtml(ticket.name)} ·
+                            ${escapeSupportHtml(ticket.email)}
+                        </div>
+                    </div>
+                    <span class="ticket-status">${escapeSupportHtml(status)}</span>
+                </div>
+
+                <p class="support-message">${escapeSupportHtml(ticket.message)}</p>
+
+                <div class="support-ticket-meta">
+                    Submitted: ${escapeSupportHtml(
+                        ticket.created_at
+                            ? new Date(ticket.created_at).toLocaleString()
+                            : "Unknown"
+                    )}
+                </div>
+
+                <div class="support-ticket-form">
+                    <label>
+                        Status
+                        <select class="ticket-status-select">
+                            ${["Open", "In Progress", "Resolved"].map(option =>
+                                `<option value="${option}" ${status === option ? "selected" : ""}>${option}</option>`
+                            ).join("")}
+                        </select>
+                    </label>
+
+                    <label>
+                        Administrator reply
+                        <textarea class="ticket-reply" maxlength="2000"
+                            placeholder="Write a response to the customer...">${escapeSupportHtml(ticket.admin_reply || "")}</textarea>
+                    </label>
+
+                    <button type="button" class="ticket-save">Save Changes</button>
+                    <span class="ticket-feedback" aria-live="polite"></span>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+async function refreshSupport() {
+    const container = byId("support-list");
+
+    try {
+        const response = await fetch("/api/support", { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const tickets = await response.json();
+        renderSupportTickets(tickets);
+    } catch (error) {
+        byId("support-summary").textContent = "Unable to load support requests.";
+        container.innerHTML =
+            '<p class="support-error">Support service connection failed. Please refresh.</p>';
+        console.error("CloudGuard support:", error);
+    }
+}
+
+async function saveSupportTicket(ticketElement) {
+    const id = ticketElement.dataset.ticketId;
+    const status = ticketElement.querySelector(".ticket-status-select").value;
+    const reply = ticketElement.querySelector(".ticket-reply").value;
+    const button = ticketElement.querySelector(".ticket-save");
+    const feedback = ticketElement.querySelector(".ticket-feedback");
+
+    button.disabled = true;
+    feedback.textContent = "Saving...";
+
+    try {
+        const response = await fetch(`/api/support/${encodeURIComponent(id)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                status: status,
+                admin_reply: reply
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || `HTTP ${response.status}`);
+        }
+
+        feedback.textContent = "Saved successfully.";
+        await refreshSupport();
+    } catch (error) {
+        feedback.textContent = `Save failed: ${error.message}`;
+        console.error("CloudGuard ticket update:", error);
+    } finally {
+        button.disabled = false;
+    }
+}
+
+byId("refresh-support").addEventListener("click", refreshSupport);
+
+byId("support-list").addEventListener("click", event => {
+    const button = event.target.closest(".ticket-save");
+    if (!button) return;
+
+    const ticket = button.closest(".support-ticket");
+    if (ticket) saveSupportTicket(ticket);
+});
+
+refreshSupport();
+setInterval(refreshSupport, 15000);

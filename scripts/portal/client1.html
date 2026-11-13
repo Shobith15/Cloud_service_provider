@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudGuard | Customer Portal</title>
+    <link rel="stylesheet" href="/portal.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">CG</div>
+            <div>
+                <h2>CloudGuard</h2>
+                <span>CUSTOMER PORTAL</span>
+            </div>
+        </div>
+
+        <p class="nav-label">WORKSPACE</p>
+        <a class="nav-item active" href="#overview">◈ &nbsp; Overview</a>
+        <a class="nav-item" href="#hosting">▣ &nbsp; Hosting</a>
+        <a class="nav-item" href="#billing">▤ &nbsp; Billing</a>
+        <a class="nav-item" href="#support">✉ &nbsp; Support</a>
+
+        <div class="sidebar-bottom">
+            <span class="server-indicator"></span>
+            <div>
+                <strong>CloudGuard Hosting</strong>
+                <span>Customer services</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">CUSTOMER WORKSPACE</p>
+                <h1 id="welcome">Welcome</h1>
+                <p class="subtitle">Manage your hosting services and account.</p>
+            </div>
+            <div class="top-right">
+                <span class="live-dot"></span>
+                <span>Portal connected</span>
+            </div>
+        </header>
+
+        <section id="overview">
+            <div class="section-heading">
+                <div>
+                    <h2>Account overview</h2>
+                    <p>Your hosting account at a glance.</p>
+                </div>
+                <span class="server-tag" id="customer-domain">Loading domain...</span>
+            </div>
+
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <div class="metric-top">HOSTING PLAN</div>
+                    <div class="metric-value" id="plan-name">--</div>
+                    <p>Current subscription</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">MONTHLY PRICE</div>
+                    <div class="metric-value" id="plan-price">--</div>
+                    <p>Demo subscription price</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">WEBSITE STATUS</div>
+                    <div class="metric-value" id="website-status">--</div>
+                    <p id="response-time">Checking website...</p>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-top">BILLING STATUS</div>
+                    <div class="metric-value" id="billing-status">--</div>
+                    <p id="next-due">Next payment: --</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="hosting">
+            <div class="section-heading">
+                <div>
+                    <h2>Hosting services</h2>
+                    <p>Monitor your website and allocated storage.</p>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <article class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Website monitoring</h2>
+                            <p>Live website availability check</p>
+                        </div>
+                        <span class="panel-icon">◉</span>
+                    </div>
+                    <div class="website-card">
+                        <span class="muted-label">WEBSITE ADDRESS</span>
+                        <strong id="website-domain">--</strong>
+                        <div class="status-line">
+                            <span class="live-dot" id="website-dot"></span>
+                            <strong id="website-detail">Checking...</strong>
+                        </div>
+                        <p id="website-response">Response time: --</p>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Storage utilization</h2>
+                            <p>Your hosting allocation</p>
+                        </div>
+                        <span class="panel-icon">▦</span>
+                    </div>
+                    <div class="storage-numbers">
+                        <strong id="storage-used">-- GB</strong>
+                        <span id="storage-limit">of -- GB</span>
+                    </div>
+                    <div class="progress">
+                        <div id="storage-bar"></div>
+                    </div>
+                    <p class="muted-text" id="storage-note">Loading storage information...</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="billing">
+            <div class="section-heading">
+                <div>
+                    <h2>Billing and invoices</h2>
+                    <p>Review your subscription and billing history.</p>
+                </div>
+                <span class="server-tag">DEMO BILLING</span>
+            </div>
+
+            <article class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Invoice history</h2>
+                        <p>Illustrative invoices for demonstration purposes.</p>
+                    </div>
+                    <span class="panel-icon">₹</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>INVOICE ID</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-list">
+                            <tr><td colspan="4">Loading invoices...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="demo-note">
+                    Demo environment — no actual payments are collected or processed.
+                </p>
+            </article>
+        </section>
+
+        <section id="support">
+            <div class="section-heading">
+                <div>
+                    <h2>Contact support</h2>
+                    <p>Submit an issue directly to the CloudGuard administrator.</p>
+                </div>
+            </div>
+
+            <article class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>New support request</h2>
+                        <p>Our administrator can review and respond to your request.</p>
+                    </div>
+                    <span class="panel-icon">✉</span>
+                </div>
+
+                <form id="support-form">
+                    <div class="form-grid">
+                        <label>
+                            Your name
+                            <input type="text" name="name" maxlength="80"
+                                   placeholder="Enter your name" required>
+                        </label>
+                        <label>
+                            Email address
+                            <input type="email" name="email" maxlength="120"
+                                   placeholder="Enter your email" required>
+                        </label>
+                    </div>
+
+                    <label>
+                        Subject
+                        <input type="text" name="subject" maxlength="120"
+                               placeholder="Briefly describe the issue" required>
+                    </label>
+
+                    <label>
+                        Message
+                        <textarea name="message" maxlength="2000" rows="5"
+                                  placeholder="Describe your issue or request..."
+                                  required></textarea>
+                    </label>
+
+                    <div class="form-footer">
+                        <span id="form-message" aria-live="polite"></span>
+                        <button type="submit" id="submit-button">Submit request</button>
+                    </div>
+                </form>
+            </article>
+        </section>
+
+        <footer>
+            <span>CloudGuard Customer Portal</span>
+            <span>Demo hosting environment · No real billing</span>
+        </footer>
+    </main>
+
+    <script src="/portal.js"></script>
+</body>
+</html>

@@ -22,6 +22,7 @@
         <a class="nav-item" href="#storage">▦ &nbsp; Storage</a>
         <a class="nav-item" href="#services">⌘ &nbsp; Services</a>
         <a class="nav-item" href="#backups">◷ &nbsp; Backups</a>
+        <a class="nav-item" href="#support">✉ &nbsp; Support Tickets</a>
 
         <div class="sidebar-bottom">
             <div class="server-indicator"></div>
@@ -131,6 +132,29 @@
             </div>
             <div id="backup-list">Loading backups...</div>
         </section>
+
+
+    <section class="panel support-panel" id="support">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">CUSTOMER SERVICE</p>
+                <h2>Support Tickets</h2>
+                <p class="panel-subtitle">Manage customer requests and administrator replies</p>
+            </div>
+            <button class="refresh-button" id="refresh-support" type="button">
+                ↻ Refresh
+            </button>
+        </div>
+
+        <div class="support-summary" id="support-summary">
+            Loading support requests...
+        </div>
+
+        <div id="support-list" aria-live="polite">
+            <p class="support-empty">Loading tickets...</p>
+        </div>
+    </section>
+
 
         <footer>
             <span>CloudGuard Admin Dashboard</span>
